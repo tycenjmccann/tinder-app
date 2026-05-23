@@ -36,18 +36,20 @@ function formatDate(dateStr: string): string {
   return date.toLocaleDateString();
 }
 
+function getInitialCollapsed(): boolean {
+  if (typeof window === "undefined") return true;
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (stored !== null) {
+    return stored === "true";
+  }
+  return window.innerWidth < 768;
+}
+
 export function HistorySidebar() {
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(getInitialCollapsed);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored !== null) {
-      setCollapsed(stored === "true");
-    } else {
-      const isMobile = window.innerWidth < 768;
-      setCollapsed(isMobile);
-    }
     setMounted(true);
   }, []);
 
