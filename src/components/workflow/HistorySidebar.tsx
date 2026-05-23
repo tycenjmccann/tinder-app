@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 
 const MOCK_RUNS = [
   { id: "wf-1", title: "User Auth Flow", date: "2024-01-15T10:30:00Z", status: "completed" },
@@ -40,9 +40,7 @@ export function HistorySidebar() {
   const [collapsed, setCollapsed] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  // useLayoutEffect fires synchronously before the browser paints,
-  // preventing a visible flash when restoring sidebar state from localStorage
-  useLayoutEffect(() => {
+  useEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) {
       setCollapsed(stored === "true");
@@ -98,48 +96,59 @@ export function HistorySidebar() {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {MOCK_RUNS.map((run) => {
-          const isActive = run.id === ACTIVE_ID;
-          return (
-            <div
-              key={run.id}
-              className={`p-3 cursor-pointer transition-colors hover:bg-gray-50 ${
-                isActive ? "border-l-4 border-blue-500 bg-blue-50" : "border-l-4 border-transparent"
-              }`}
-            >
-              {collapsed ? (
-                <div
-                  className={`w-2 h-2 rounded-full mx-auto ${
-                    run.status === "completed"
-                      ? "bg-green-500"
-                      : run.status === "in-progress"
-                        ? "bg-yellow-500"
-                        : "bg-red-500"
-                  }`}
-                  title={run.title}
-                />
-              ) : (
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {run.title}
-                  </p>
-                  <div className="flex items-center justify-between mt-1">
-                    <span className="text-xs text-gray-500">
-                      {formatDate(run.date)}
-                    </span>
-                    <span
-                      className={`text-xs px-1.5 py-0.5 rounded-full ${statusStyles[run.status] || ""}`}
-                    >
-                      {run.status}
-                    </span>
+      <nav aria-label="Previous workflow runs" className="flex-1 overflow-y-auto">
+        <ul role="list">
+          {MOCK_RUNS.map((run) => {
+            const isActive = run.id === ACTIVE_ID;
+            return (
+              <li
+                key={run.id}
+                role="button"
+                tabIndex={0}
+                aria-current={isActive ? "true" : undefined}
+                onClick={() => {}}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                  }
+                }}
+                className={`p-3 cursor-pointer transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900 ${
+                  isActive ? "border-l-4 border-blue-500 bg-blue-50" : "border-l-4 border-transparent"
+                }`}
+              >
+                {collapsed ? (
+                  <div
+                    className={`w-2 h-2 rounded-full mx-auto ${
+                      run.status === "completed"
+                        ? "bg-green-500"
+                        : run.status === "in-progress"
+                          ? "bg-yellow-500"
+                          : "bg-red-500"
+                    }`}
+                    title={run.title}
+                  />
+                ) : (
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {run.title}
+                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <span className="text-xs text-gray-500">
+                        {formatDate(run.date)}
+                      </span>
+                      <span
+                        className={`text-xs px-1.5 py-0.5 rounded-full ${statusStyles[run.status] || ""}`}
+                      >
+                        {run.status}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </aside>
   );
 }

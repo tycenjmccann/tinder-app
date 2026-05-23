@@ -1,5 +1,3 @@
-"use client";
-
 import { HistorySidebar } from "@/components/workflow/HistorySidebar";
 import { WorkflowBoard } from "@/components/workflow/WorkflowBoard";
 
