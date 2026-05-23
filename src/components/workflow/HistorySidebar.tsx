@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 
 const MOCK_RUNS = [
   { id: "wf-1", title: "User Auth Flow", date: "2024-01-15T10:30:00Z", status: "completed" },
@@ -40,7 +40,9 @@ export function HistorySidebar() {
   const [collapsed, setCollapsed] = useState(true);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
+  // useLayoutEffect fires synchronously before the browser paints,
+  // preventing a visible flash when restoring sidebar state from localStorage
+  useLayoutEffect(() => {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored !== null) {
       setCollapsed(stored === "true");
