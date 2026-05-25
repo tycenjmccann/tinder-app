@@ -78,13 +78,35 @@ const options: ThemeOption[] = [
 export default function ThemeToggle() {
   const { theme, setTheme } = useTheme();
 
+  const handleKeyDown = (e: React.KeyboardEvent, currentIndex: number) => {
+    let nextIndex: number | null = null;
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      nextIndex = (currentIndex + 1) % options.length;
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      nextIndex = (currentIndex - 1 + options.length) % options.length;
+    }
+
+    if (nextIndex !== null) {
+      setTheme(options[nextIndex].value);
+      // Focus the newly selected option
+      const container = (e.currentTarget as HTMLElement).parentElement;
+      if (container) {
+        const buttons = container.querySelectorAll<HTMLButtonElement>('[role="radio"]');
+        buttons[nextIndex]?.focus();
+      }
+    }
+  };
+
   return (
     <div
       className="theme-toggle"
       role="radiogroup"
       aria-label="Theme preference"
     >
-      {options.map((option) => (
+      {options.map((option, index) => (
         <button
           key={option.value}
           role="radio"
@@ -94,12 +116,7 @@ export default function ThemeToggle() {
             theme === option.value ? "theme-toggle__option--active" : ""
           }`}
           onClick={() => setTheme(option.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") {
-              e.preventDefault();
-              setTheme(option.value);
-            }
-          }}
+          onKeyDown={(e) => handleKeyDown(e, index)}
           tabIndex={theme === option.value ? 0 : -1}
         >
           <span className="theme-toggle__icon">{option.icon}</span>

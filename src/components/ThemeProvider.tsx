@@ -71,9 +71,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     applyTheme(resolved);
   }, []);
 
-  // Prevent hydration mismatch by not rendering until mounted
+  // During SSG prerender or before hydration, provide a fallback context value
+  // so that useTheme() doesn't throw. This prevents the build crash while
+  // avoiding hydration mismatches (no actual theme is applied to the DOM yet).
   if (!mounted) {
-    return <>{children}</>;
+    return (
+      <ThemeContext.Provider value={{ theme: "system", setTheme: () => {}, resolvedTheme: "light" }}>
+        {children}
+      </ThemeContext.Provider>
+    );
   }
 
   return (
