@@ -3,6 +3,8 @@
 import ThemeToggle from "@/components/ThemeToggle";
 import { useTheme } from "@/components/ThemeProvider";
 
+export const dynamic = "force-dynamic";
+
 export default function SettingsPage() {
   const { resolvedTheme } = useTheme();
 
